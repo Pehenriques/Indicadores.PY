@@ -1,0 +1,101 @@
+Caso seja necessario para um rota mais segura, processo de autenticação:
+
+ataulizar o banco de dados: 
+CREATE TABLE Usuarios (
+    ID INT IDENTITY(1,1) PRIMARY KEY,
+    Nome NVARCHAR(100),
+    Email NVARCHAR(100) UNIQUE NOT NULL,
+    Senha NVARCHAR(255) NOT NULL,
+    Tipo_Usuario NVARCHAR(20) NOT NULL -- Valores: 'cliente' ou 'admin'
+);
+
+implementar login no flask:
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+from werkzeug.security import generate_password_hash, check_password_hash
+
+app.secret_key = 'sua_chave_secreta_aleatoria'
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        email = request.form['email']
+        senha = request.form['senha']
+
+        # Verificar usuário no banco de dados
+        cursor = conexao.cursor()
+        cursor.execute("SELECT * FROM Usuarios WHERE Email = ?", email)
+        usuario = cursor.fetchone()
+
+        if usuario and check_password_hash(usuario.Senha, senha):
+            session['user_id'] = usuario.ID
+            session['tipo_usuario'] = usuario.Tipo_Usuario
+
+            if usuario.Tipo_Usuario == 'admin':
+                return redirect(url_for('gestao_indicadores'))
+            else:
+                return redirect(url_for('cadastro'))
+        else:
+            flash("Email ou senha incorretos!", "error")
+    
+    return render_template('login.html')
+
+rota de logout:
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
+
+Proteger rotas por tipo de usuario:
+from functools import wraps
+
+def login_required(tipo_usuario=None):
+    def decorator(f):
+        @wraps(f)
+        def decorated_function(*args, **kwargs):
+            if 'user_id' not in session:
+                return redirect(url_for('login'))
+            if tipo_usuario and session.get('tipo_usuario') != tipo_usuario:
+                return "Acesso negado.", 403
+            return f(*args, **kwargs)
+        return decorated_function
+    return decorator
+
+decorator nas rotas:
+@app.route('/cadastro', methods=['GET', 'POST'])
+@login_required('cliente')  # Apenas clientes podem acessar
+def cadastro():
+    # Lógica de cadastro...
+
+@app.route('/gestao-indicadores')
+@login_required('admin')  # Apenas administradores podem acessar
+def gestao_indicadores():
+    # Lógica de gestão...
+
+criar pagina de login:
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>Login</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+        <p style="color: red;">{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    {% endwith %}
+    <form method="post" action="{{ url_for('login') }}">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" name="senha" required><br><br>
+        <button type="submit">Entrar</button>
+    </form>
+</body>
+</html>
+

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Indicadores</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        fetch('/listar_dados')
+            .then(response => response.json())
+            .then(data => {
+                const tabela = document.getElementById("tabela-indicadores");
+                tabela.innerHTML = ""; // Limpa a tabela
+
+                data.forEach(indicador => {
+                    const row = document.createElement("tr");
+
+                    row.innerHTML = `
+                        <td>${indicador.id}</td>
+                        <td>${indicador.nome}</td>
+                        <td>${indicador.email}</td>
+                        <td>${indicador.telefone}</td>
+                        <td>${indicador.cpf}</td>
+                        <td>${indicador.endereco}</td>
+                        <td>
+                            <a href="/editar_indicador?id=${indicador.id}" class="btn-editar">✏️ Alterar</a>
+                            <a href="#" onclick="deletarIndicador(${indicador.id})" class="btn-deletar">🗑️ Deletar</a>
+                        </td>
+                    `;
+                    tabela.appendChild(row);
+                });
+            })
+            .catch(error => console.error("Erro ao buscar dados:", error));
+});
+
+function deletarIndicador(id) {
+    if (confirm("Tem certeza que deseja deletar este indicador?")) {
+        fetch(`/deletar_dados/${id}`, { method: "DELETE" })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.mensagem);
+                location.reload(); // Recarrega a página
+            })
+            .catch(error => console.error("Erro ao deletar indicador:", error));
+    }
+}
+    </script>
+</head>
+<body>
+    <h1>Lista de Indicadores</h1>
+    <table border="1">
+        <caption>Indicadores cadastrados</caption>
+        <tr>
+            <th>ID</th>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Telefone</th>
+            <th>CPF</th>
+            <th>Endereço</th>
+            <th>Ações</th>
+        </tr>
+        <tbody id="tabela-indicadores">
+            <!-- Os dados serão inseridos aqui pelo JavaScript -->
+        </tbody>
+    </table>
+    
+    <a href="{{ url_for('index') }}">Cadastrar novo indicador</a>
+</body>
+</html>

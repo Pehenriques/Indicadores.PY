@@ -1,0 +1,56 @@
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dados do Indicador</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const indicadorId = new URLSearchParams(window.location.search).get("id");
+
+            if (indicadorId) {
+                fetch(`/listar_dados?id=${indicadorId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            const indicador = data[0];
+
+                            document.getElementById("indicador-id").textContent = indicador.id;
+                            document.getElementById("indicador-nome").textContent = indicador.nome;
+                            document.getElementById("indicador-email").textContent = indicador.email;
+                            document.getElementById("indicador-telefone").textContent = indicador.telefone;
+                            document.getElementById("indicador-cpf").textContent = indicador.cpf;
+                            document.getElementById("indicador-endereco").textContent = indicador.endereco;
+
+                            document.getElementById("cadastro-prestador-link").href = `/cadastro_prestador?id=${indicador.id}`;
+                            document.getElementById("editar-indicador-link").href = `/editar_indicador?id=${indicador.id}`;
+                            document.getElementById("deletar-indicador-link").href = `/deletar_indicador?id=${indicador.id}`;
+                        }
+                    })
+                    .catch(error => console.error("Erro ao buscar dados:", error));
+            }
+        });
+    </script>
+</head>
+<body>
+    <h1>Dados do Indicador</h1>
+    <div class="indicador-container">
+        <p><strong>ID:</strong> <span id="indicador-id"></span></p>
+        <p><strong>Nome:</strong> <span id="indicador-nome"></span></p>
+        <p><strong>Email:</strong> <span id="indicador-email"></span></p>
+        <p><strong>Telefone:</strong> <span id="indicador-telefone"></span></p>
+        <p><strong>CPF:</strong> <span id="indicador-cpf"></span></p>
+        <p><strong>Endereço:</strong> <span id="indicador-endereco"></span></p>
+        <p>Cadastro realizado com sucesso! Agora, compartilhe o link abaixo para indicar um prestador:</p>
+        <a id="cadastro-prestador-link" href="#">Clique aqui para o cadastro do prestador</a>
+        
+        <div class="acoes-indicador">
+            <a id="editar-indicador-link" href="#">✏️ Alterar Informações</a>
+            <a id="deletar-indicador-link" href="#">🗑️ Deletar Indicador</a>
+        </div>
+    </div>
+
+    <a href="{{ url_for('index') }}">Cadastrar outro indicador</a><br>
+    <a href="{{ url_for('indicadores') }}">Voltar para lista de indicadores</a>
+</body>
+</html>

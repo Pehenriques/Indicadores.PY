@@ -1,0 +1,10 @@
+App.py
+para iniciar a aplicação = python app.py
+para iniciar o servidor = .\venv\Scripts\activate
+key flask= alluagro
+
+Web
+http://127.0.0.1:5000
+acessos gestão: /gestao-indicadores
+acessos indicadores: /cadastro e /exibir
+acessos ao cadastro de fornecedores: /cadastro_fornecedores

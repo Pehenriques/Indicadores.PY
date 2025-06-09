@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Indicador</title>
+</head>
+<body>
+    <h1>Editar Indicador</h1>
+    <form action="/atualizar_indicador" method="post">
+        <input type="hidden" name="id" value="{{ indicador.id }}">
+        <label>Nome:</label><input type="text" name="nome" value="{{ indicador.nome }}"><br>
+        <label>Email:</label><input type="email" name="email" value="{{ indicador.email }}"><br>
+        <label>Telefone:</label><input type="text" name="telefone" value="{{ indicador.telefone }}"><br>
+        <label>CPF:</label><input type="text" name="cpf" value="{{ indicador.cpf }}"><br>
+        <label>Endereço:</label><input type="text" name="endereco" value="{{ indicador.endereco }}"><br>
+        <button type="submit">Salvar Alterações</button>
+    </form>
+    <h1>{{ mensagem }}</h1>
+    <a href="/indicadores">Voltar para indicadores</a>
+</body>
+</html>

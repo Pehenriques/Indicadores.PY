@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+</head>
+<body>
+    <h1>{{ 'Atualizar Indicador' if edicao else 'Cadastro de Indicadores' }}</h1>
+
+    {% if mensagem_erro %}
+        <p style="color: red;">{{ mensagem_erro }}</p>
+    {% endif %}
+
+    <form id="formCadastro">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="telefone">Telefone:</label>
+        <input type="text" id="telefone" name="telefone" required pattern="\(\d{2}\) \d{5}-\d{4}" title="Digite o telefone no formato (00) 00000-0000"><br><br>
+
+        <label for="cpf">CPF:</label>
+        <input type="text" id="cpf" name="cpf" required pattern="\d{3}\.\d{3}\.\d{3}-\d{2}" title="Digite o CPF no formato 000.000.000-00"><br><br>
+
+        <label for="endereco">Endereço:</label>
+        <input type="text" id="endereco" name="endereco" required><br><br>
+
+        <button type="submit">{{ 'Atualizar' if edicao else 'Cadastrar' }}</button>
+    </form>
+
+    <p id="linkIndicador" style="display:none;"></p>
+
+    {% if not edicao %}
+        <a href="{{ url_for('indicadores') }}">Ver lista de indicadores</a>
+    {% else %}
+        <a href="{{ url_for('indicadores') }}">Voltar à Gestão de Indicadores</a>
+    {% endif %}
+
+    <script>
+    document.getElementById("formCadastro").addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const nome = document.getElementById("nome").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const telefone = document.getElementById("telefone").value.trim();
+    const cpf = document.getElementById("cpf").value.trim();
+    const endereco = document.getElementById("endereco").value.trim();
+
+    if (!nome || !email || !telefone || !cpf || !endereco) {
+        alert("Preencha todos os campos!");
+        return;
+    }
+
+    try {
+        const dados = { nome, email, telefone, cpf, endereco };
+
+        const response = await fetch("/salvar_dados", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(dados)
+        });
+
+        const resultado = await response.json();
+
+        if (response.status === 201) {
+            const linkDisplay = document.getElementById("linkIndicador");
+            linkDisplay.style.display = "block";
+            linkDisplay.innerHTML = `Compartilhe este link para cadastro de prestadores: <br><a href="${resultado.link}" target="_blank">${resultado.link}</a>`;
+        } else {
+            alert("Erro ao cadastrar: " + resultado.mensagem);
+        }
+
+    } catch (error) {
+        console.error("Erro ao cadastrar indicador:", error);
+        alert("Erro interno no cadastro.");
+    }
+});
+</script>
+
+</body>
+</html>
