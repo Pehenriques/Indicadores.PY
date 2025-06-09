@@ -2,8 +2,16 @@ services:
   - type: web
     name: cadastro-indicador
     env: python
+    plan: free
     buildCommand: pip install -r requirements.txt
-    startCommand: python app.py
+    startCommand: gunicorn app:app
     envVars:
-      - key: FLASK_ENV
-        value: production
+      - key: DB_HOST
+        value: seu_host.mysql.com
+      - key: DB_USER
+        value: seu_usuario
+      - key: DB_PASSWORD
+        value: sua_senha
+      - key: DB_NAME
+        value: indicadores_db
+
