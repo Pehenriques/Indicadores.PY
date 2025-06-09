@@ -9,7 +9,7 @@ app = Flask(__name__)
 # Conexão com MySQL
 def get_db_connection():
     return mysql.connector.connect(
-        host="seuhost.mysql.com",
+        host="localhost",
         user="root",
         password="1234",
         database="indicadores_db"
