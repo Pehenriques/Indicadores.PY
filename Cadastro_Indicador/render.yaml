@@ -9,8 +9,8 @@ services:
       - key: DB_HOST
         value: seu_host.mysql.com
       - key: DB_USER
-        value: seu_usuario
+        value: root
       - key: DB_PASSWORD
-        value: sua_senha
+        value: 1234
       - key: DB_NAME
         value: indicadores_db
